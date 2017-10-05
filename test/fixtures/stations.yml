@@ -1,0 +1,19 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  name: MyString
+  short_name: MyString
+  lat: 9.99
+  lon: 9.99
+  region_id: 1
+  capacity: 1
+  rental_url: MyText
+
+two:
+  name: MyString
+  short_name: MyString
+  lat: 9.99
+  lon: 9.99
+  region_id: 1
+  capacity: 1
+  rental_url: MyText

@@ -12,3 +12,14 @@ task :get_scores => :environment do
 	url = 'https://bikeangels-api.citibikenyc.com/bikeangels/v1/scores'
 	Score.import cols, JSON.parse(open(url).read)['stations'].to_a
 end
+
+task :import_stations => :environment do
+	require 'open-uri'
+	url = 'https://gbfs.citibikenyc.com/gbfs/en/station_information.json'
+	json = JSON.parse(open(url).read)#'stations'].to_a
+	keys = %w(station_id name short_name lat lon region_id capacity rental_url)
+	stations = json["data"]["stations"].map{ |d| d.slice(*keys).values unless d["name"]=~/soon/i }.compact
+	keys[0] = "id"
+	# binding.pry
+	Station.import keys, stations
+end
