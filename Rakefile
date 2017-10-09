@@ -23,3 +23,10 @@ task :import_stations => :environment do
 	# binding.pry
 	Station.import keys, stations
 end
+
+task :upgrade_geog => :environment do
+	Station.where(geog:nil).each do |s|
+		s.geog =  "POINT(#{s.lon} #{s.lat})"
+		s.save!
+	end
+end

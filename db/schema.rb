@@ -10,10 +10,23 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171005195322) do
+ActiveRecord::Schema.define(version: 20171006002638) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+  enable_extension "postgis"
+
+  create_table "costs", force: :cascade do |t|
+    t.integer "left_id"
+    t.integer "right_id"
+    t.decimal "distance"
+    t.decimal "haversine"
+    t.decimal "time"
+    t.text "polyline"
+    t.integer "mode"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
 
   create_table "scores", force: :cascade do |t|
     t.integer "station_id"
@@ -32,6 +45,8 @@ ActiveRecord::Schema.define(version: 20171005195322) do
     t.text "rental_url"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.geography "geog", limit: {:srid=>0, :type=>"geometry"}
+    t.index ["geog"], name: "index_stations_on_geog", using: :gist
   end
 
 end

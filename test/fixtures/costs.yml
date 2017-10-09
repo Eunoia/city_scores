@@ -1,0 +1,19 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  left_id: 1
+  right_id: 1
+  distance: 
+  haversine: 
+  time: 
+  polyline: MyText
+  mode: 1
+
+two:
+  left_id: 1
+  right_id: 1
+  distance: 
+  haversine: 
+  time: 
+  polyline: MyText
+  mode: 1
