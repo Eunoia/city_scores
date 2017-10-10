@@ -7,4 +7,8 @@ Rails.application.routes.draw do
 			end
 		end
 	end
+
+	require 'resque/server'
+	mount Resque::Server, at: '/jobs'
+
 end

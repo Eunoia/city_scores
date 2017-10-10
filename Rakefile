@@ -2,9 +2,10 @@
 # for example lib/tasks/capistrano.rake, and they will automatically be available to Rake.
 
 require_relative 'config/application'
-
+require 'resque/tasks'
 Rails.application.load_tasks
 
+task 'resque:setup' => :environment
 
 task :get_scores => :environment do
 	require 'open-uri'
@@ -29,5 +30,13 @@ task :upgrade_geog => :environment do
 	Station.where(geog:nil).each do |s|
 		s.geog =  "POINT(#{s.lon} #{s.lat})"
 		s.save!
+	end
+end
+
+task :enqueue_cost_lookups => :environment do
+	pairs = Station.pluck(:id).repeated_permutation(2).to_a.select{ |i,j| i!=j }.shuffle
+	puts "Wow! So many pairs: #{pairs.length}"
+	pairs.each do |pair|
+		ap GenerateRouteCostJob.perform_now(*pair)
 	end
 end
