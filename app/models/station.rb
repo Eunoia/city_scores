@@ -1,10 +1,11 @@
 class Station < ApplicationRecord
 	has_many :scores
 	def link
+		most_recent_date = Score.select("max(created_at) as created_at")[0].created_at.iso8601(6)
 		sql =<<~SQL
 			with subj as (select * from stations
 			left join scores on scores.station_id = stations.id 
-			where scores.created_at = '2017-10-10T15:09:30.489963Z' 
+			where scores.created_at = '#{most_recent_date}' 
 			and stations.id='#{id}')
 
 			select 
@@ -16,7 +17,7 @@ class Station < ApplicationRecord
 			cross join subj 
 			left join scores on scores.station_id = stations.id 
 			where (scores.score>=0) --subj.station_id = scores.station_id or 
-			and scores.created_at = '2017-10-10T15:09:30.489963Z' 
+			and scores.created_at = '#{most_recent_date}' 
 			and stations.region_id=71 order by 4 desc
 			limit 1
 		SQL
