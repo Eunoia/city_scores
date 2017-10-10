@@ -11,6 +11,7 @@ task :get_scores => :environment do
 	cols = %i(station_id score)
 	url = 'https://bikeangels-api.citibikenyc.com/bikeangels/v1/scores'
 	Score.import cols, JSON.parse(open(url).read)['stations'].to_a
+	puts Score.select("max(created_at) as created_at")[0].created_at.iso8601(6)
 end
 
 task :import_stations => :environment do
