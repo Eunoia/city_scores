@@ -34,7 +34,13 @@ task :upgrade_geog => :environment do
 end
 
 task :enqueue_cost_lookups => :environment do
-	pairs = Station.pluck(:id).repeated_permutation(2).to_a.select{ |i,j| i!=j }.shuffle
+	sql2 =<<~SQL
+	select subj.id as left_id, stations.id as right_id
+	from stations as subj 
+	join stations on ST_DWithin(subj.geog, stations.geog, 1600, true) 
+	where subj.id != stations.id order by subj.geog<->stations.geog desc
+	SQL
+	pairs = Station.connection.execute(sql2).to_a.map(&:values)
 	puts "Wow! So many pairs: #{pairs.length}"
 	pairs.each do |pair|
 		ap GenerateRouteCostJob.perform_now(*pair)

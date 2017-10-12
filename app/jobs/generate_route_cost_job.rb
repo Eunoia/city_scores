@@ -5,7 +5,7 @@ class GenerateRouteCostJob < ApplicationJob
 
   def perform(*args)
   	left_id, right_id = *args
-  	return if Cost.where(left_id: left_id, right_id:right_id).exists?
+  	return true if Cost.where(left_id: left_id, right_id:right_id).exists?
   	left = Station.find(left_id)
   	right = Station.find(right_id)
   	locations = [left.as_json.slice(*%w[lon lat]), right.as_json.slice(*%w[lon lat])].to_json
