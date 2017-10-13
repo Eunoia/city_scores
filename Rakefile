@@ -37,8 +37,8 @@ task :enqueue_cost_lookups => :environment do
 	sql2 =<<~SQL
 	select subj.id as left_id, stations.id as right_id
 	from stations as subj 
-	join stations on ST_DWithin(subj.geog, stations.geog, 1600, true) 
-	where subj.id != stations.id order by subj.geog<->stations.geog desc
+	join stations on ST_DWithin(subj.geog, stations.geog, 3200, true) 
+	where subj.id != stations.id and subj.geog <-> stations.geog > 1000 order by subj.geog<->stations.geog desc
 	SQL
 	pairs = Station.connection.execute(sql2).to_a.map(&:values)
 	puts "Wow! So many pairs: #{pairs.length}"
