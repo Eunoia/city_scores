@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171010054058) do
+ActiveRecord::Schema.define(version: 20171013181715) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -26,6 +26,8 @@ ActiveRecord::Schema.define(version: 20171010054058) do
     t.integer "mode"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["id"], name: "index_costs_on_id"
+    t.index ["left_id", "right_id"], name: "index_costs_on_left_id_and_right_id"
   end
 
   create_table "scores", force: :cascade do |t|
@@ -35,6 +37,7 @@ ActiveRecord::Schema.define(version: 20171010054058) do
     t.datetime "updated_at", null: false
     t.index ["created_at", "score"], name: "index_scores_on_created_at_and_score"
     t.index ["created_at"], name: "index_scores_on_created_at"
+    t.index ["station_id"], name: "index_scores_on_station_id"
   end
 
   create_table "stations", force: :cascade do |t|
@@ -49,6 +52,7 @@ ActiveRecord::Schema.define(version: 20171010054058) do
     t.datetime "updated_at", null: false
     t.geography "geog", limit: {:srid=>0, :type=>"geometry"}
     t.index ["geog"], name: "index_stations_on_geog", using: :gist
+    t.index ["id"], name: "index_stations_on_id"
     t.index ["name"], name: "index_stations_on_name"
     t.index ["region_id"], name: "index_stations_on_region_id"
   end
