@@ -14,7 +14,9 @@ class Station < ApplicationRecord
 			(st_distance(stations.geog, subj.geog) / 133.333 ) as cost, 
 			costs.time/60 as costed_time,
 			--(((abs(subj.score) + abs(scores.score))*.1)/(1+st_distance(stations.geog, subj.geog) / 133.333 ))*60 as wage,
-			(((abs(subj.score) + abs(scores.score))*.1)/(1+st_distance(stations.geog, subj.geog) / 133.333 ))*60 as wage,
+			(((abs(subj.score) + abs(scores.score))*.1)/coalesce(costs.time, (1+st_distance(stations.geog, subj.geog) / 133.333 )))*60 as wage,
+			costs.distance as costed_distance,
+			st_distance(stations.geog, subj.geog) as st_dist,
 			stations.name,  stations.lat, stations.lon, scores.score
 			from stations
 			cross join subj 
