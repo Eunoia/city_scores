@@ -18,3 +18,4 @@
 
 .byebug_history
 .pgsync.yml
+coverage/
