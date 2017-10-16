@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171013181715) do
+ActiveRecord::Schema.define(version: 20171015202330) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -28,6 +28,8 @@ ActiveRecord::Schema.define(version: 20171013181715) do
     t.datetime "updated_at", null: false
     t.index ["id"], name: "index_costs_on_id"
     t.index ["left_id", "right_id"], name: "index_costs_on_left_id_and_right_id"
+    t.index ["left_id"], name: "index_costs_on_left_id"
+    t.index ["right_id"], name: "index_costs_on_right_id"
   end
 
   create_table "scores", force: :cascade do |t|
@@ -50,7 +52,7 @@ ActiveRecord::Schema.define(version: 20171013181715) do
     t.text "rental_url"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.geography "geog", limit: {:srid=>0, :type=>"geometry"}
+    t.geometry "geog", limit: {:srid=>0, :type=>"geometry"}
     t.index ["geog"], name: "index_stations_on_geog", using: :gist
     t.index ["id"], name: "index_stations_on_id"
     t.index ["name"], name: "index_stations_on_name"
