@@ -1,40 +1,39 @@
 class Station < ApplicationRecord
 	has_many :scores
-	def link
+	def self.links
 		most_recent_date = Score.select("max(created_at) as created_at")[0].created_at.iso8601(6)
 		sql =<<~SQL
 			with subj as (select stations.*, scores.score from stations
 			left join scores on scores.station_id = stations.id 
 			where scores.created_at = '#{most_recent_date}' 
-			and stations.id='#{id}')
+			and scores.score<=0),
 
+			pass1 as (
 			select 
 			subj.id, stations.id,
 			stations.id as sid, abs(subj.score) + abs(scores.score) as value,
 			(st_distance(stations.geog, subj.geog) / 133.333 ) as cost, 
 			costs.time/60 as costed_time,
-			--(((abs(subj.score) + abs(scores.score))*.1)/(1+st_distance(stations.geog, subj.geog) / 133.333 ))*60 as wage,
-			(((abs(subj.score) + abs(scores.score))*.1)/coalesce(costs.time, (1+st_distance(stations.geog, subj.geog) / 133.333 )))*60 as wage,
+			(((abs(subj.score) + abs(scores.score))*.1)/(1+st_distance(stations.geog, subj.geog) / 133.333 ))*60 as wage,    
+			-- (((abs(subj.score) + abs(scores.score))*.1)/coalesce(costs.time, (1+st_distance(stations.geog, subj.geog) / 133.333 )))*60 as wage,
 			costs.distance as costed_distance,
 			st_distance(stations.geog, subj.geog) as st_dist,
-			stations.name,  stations.lat, stations.lon, scores.score
+			rank() OVER (partition by subj.id order by (((abs(subj.score) + abs(scores.score))*.1)/(1+st_distance(stations.geog, subj.geog) / 133.333 ))*60 desc),
+			stations.name,  stations.lat, stations.lon, scores.score,
+			subj.id as subj_id, subj.name as subj_name, subj.lat as subj_lat, subj.lon as subj_lon,
+			costs.polyline
 			from stations
 			cross join subj 
 			left join scores on scores.station_id = stations.id 
 			left join costs on (costs.left_id = subj.id and costs.right_id = stations.id)
-			where (scores.score>=1) --subj.station_id = scores.station_id or 
+			where (scores.score>=0 and scores.score > subj.score) --subj.station_id = scores.station_id or 
 			and scores.created_at = '#{most_recent_date}'
 			and subj.id != stations.id
 			and stations.region_id=71 order by 7 desc
-			limit 1
+			)
+			select * from pass1 where rank=1
 		SQL
-		Station.connection.execute(sql)[0].merge(subj_id: id, subj_name: name, subj_lat: lat, subj_lon: lon).to_h
+		
+		Station.connection.execute(sql).to_a
 	end
 end
-
-# Example:
-# Score.where(created_at: '2017-10-09 00:12:03.411055') # Get the latest scores
-#  .where("score < 0") # where stations can be picked up from
-#  .pluck(:station_id).map{ |sid|  # For each of those stations
-#    Station.find(sid).link.to_a  # Get the most optimal drop off station
-#		}.map(&:to_h).sort_by{ |s| s["wage"] };nil # sort all stations by possible money
