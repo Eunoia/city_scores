@@ -15,7 +15,7 @@ gem 'activerecord-postgis-adapter'
 gem 'activerecord-import'
 gem 'awesome_print'
 gem 'resque'
-
+gem 'uglifier'
 
 group :development, :test do
   gem 'pry'
