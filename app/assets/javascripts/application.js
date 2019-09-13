@@ -11,4 +11,6 @@
 // about supported directives.
 //
 //= require rails-ujs
+//= require d3.v3.min.js
+//= require d3.geo.projection.js
 //= require_tree .

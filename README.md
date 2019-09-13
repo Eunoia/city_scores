@@ -1,24 +1,12 @@
-# README
+# City Scores
+-------
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+Have you ever wanted to become an elite bike angel?
 
-Things you may want to cover:
+Use this app to find the best routes to move bikes.
 
-* Ruby version
+![Screenshot of good routes](/public/screenshot.png)
 
-* System dependencies
+You'll need to restore this database backup of routes [city_bike_route_data.sql](https://bit.ly/2lP6MgD)
 
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+And pay off bitrot accrued since 2017.

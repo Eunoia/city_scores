@@ -1,0 +1,84 @@
+<div id='routes'>
+  <h3>Loading....</h3></div>
+<style>
+#map {
+  height: 100px;
+  width: 200px;
+}
+
+#routes * {
+  display: inline-block;
+}
+
+#routes p{
+	padding-top: 3em;
+  margin: 1em;
+}
+#routes p svg{
+  margin: .5em;
+}
+</style>
+<script type="text/javascript">
+//Load in GeoJSON data
+d3.json("/api/v1/routes/segments", function(data) {
+  $("h3").detach();
+  for (var i = 0; i < data.length; i++) {
+    json = data[i]
+    if(typeof json.polyline === 'undefined'){ continue}
+    var manhattan_distance = Math.round(parseFloat(json.manahat * 1000))
+    var as_the_crow_flys = Math.round(json.crow)
+    var pct_over_crow = (manhattan_distance/as_the_crow_flys).toFixed(2)
+    $("#routes").append("<p>" + json.name + " -> "+json.subj_name+"<br>" + as_the_crow_flys + " meters as the crow flies<br>" + manhattan_distance + " meters as you bike<br>" + pct_over_crow + "x less efficant than flying.<br>Earns you " + json.score + " points<br></p>")
+
+    json = polyline.toGeoJSON(json.polyline, 6)
+
+    //Width and height
+    var w = 200;
+    var h = 200;
+
+    //Define map projection
+    var projection = d3.geo.mercator()
+      .translate([0, 0])
+      .scale(1);
+    var path = d3.geo.path()
+      .projection(projection);
+
+    // Calculate bounding box transforms for entire collection
+    var b = path.bounds(json),
+      s = .95 / Math.max((b[1][0] - b[0][0]) / w, (b[1][1] - b[0][1]) / h),
+      t = [(w - s * (b[1][0] + b[0][0])) / 2, (h - s * (b[1][1] + b[0][1])) / 2];
+
+    // Update the projection    
+    projection
+      .scale(s)
+      .translate(t);
+
+    //Define path generator
+    //Create SVG element
+    var svg = d3.select("#routes p:last-of-type")
+      .append("svg")
+      .attr("width", w)
+      .attr("height", h);
+    //Bind data and create one path per GeoJSON feature
+    svg.selectAll("path")
+      .data([json])
+      .enter()
+      .append("path")
+      .attr("d", path)
+      .style("stroke", "black")
+      .style("stroke-width", "3")
+      .style("fill", "none");
+      colors = ['green', 'red']
+ aa = [parseFloat(data[i].lon), parseFloat(data[i].lat)];
+	bb = [parseFloat(data[i].subj_lon), parseFloat(data[i].subj_lat)];
+    svg.selectAll("circle")
+		.data([aa,bb]).enter()
+		.append("circle")
+		.attr("cx", function (d) { console.log(projection(d)); return projection(d)[0]; })
+		.attr("cy", function (d) { return projection(d)[1]; })
+		.attr("r", "4px")
+		.attr("fill", function(d){ return colors.pop() })
+  }
+});
+
+</script>

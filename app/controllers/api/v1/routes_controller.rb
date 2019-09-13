@@ -6,7 +6,18 @@ module Api::V1
 		end
 
 		def segments
-			render json: Station.links
+			redis = Resque.redis.redis
+			links = redis.get('links')
+			if links.nil?
+				links = Station.links
+				n = DateTime.now
+				b = DateTime.now.beginning_of_hour
+				e = DateTime.now.end_of_hour
+				hour_half = (b + 30.minutes) > n ? (b + 30.minutes) : e
+				ttl = ((n - hour_half).abs * 24 * 60 * 60).to_i
+				redis.setex("links", ttl, links.to_json)
+			end
+			render json: links
 		end
 	end
 end
